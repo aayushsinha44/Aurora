@@ -95,9 +95,10 @@ def execute(exename,language, timelimit):
 	inputfile = " <env/input.txt 1>env/output.txt 2>env/error.txt"
 	if language == "Java" and not(os.path.exists("env/"+exename+".class")): 
 			exename = "main/"+exename
-	cmd = 'ulimit -p 100; su judge -c \"'+langarr[language]["execute"]+"; exit;\""
+	cmd = 'ulimit -p 100; su root -c \"'+langarr[language]["execute"]+"; exit;\""
 	cmd = cmd.replace("[exename]", exename)
 	cmd = cmd.replace("[inputfile]", inputfile)
+	print(cmd)
 
 	os.system("chmod 100 .")
 	if(os.path.exists("env/input.txt")): os.system("chmod 777 env/input.txt")
@@ -105,7 +106,7 @@ def execute(exename,language, timelimit):
 	if(os.path.exists("env/output.txt")): os.system("chmod 777 env/output.txt")
 
 	starttime = time.time()
-	proc = subprocess.Popen([cmd], shell=True, preexec_fn=os.setsid)
+	proc = subprocess.Popen([cmd], shell=True, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	try:
 		print(proc.communicate(timeout=timelimit))
 		t = proc.returncode
@@ -308,12 +309,12 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
 
 
 if __name__ == "__main__":
-    # Create the server, binding to localhost on port 8723
+    	# Create the server, binding to localhost on port 8723
 	server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 	server.request_queue_size = 100
 	print('Queue Size : ', server.request_queue_size)
-    # Activate the server; this will keep running until you
-    # interrupt the program with Ctrl-C
+    	# Activate the server; this will keep running until you
+    	# interrupt the program with Ctrl-C
 	print("Waiting for submissions... ")
 	try:
 		server.serve_forever()
